@@ -253,7 +253,7 @@ rm -rf /    - Delete the all saved files
     elif line_text == directory + "desktop":
         closeCLI()
     elif line_text == directory + "exit":
-        quit()
+        quit(1)
     elif line_text == directory + "time":
         time = strftime("%H:%M:%S")
         entryCLI.insert(tkinter.END, f"\n{time}\n{directory}")
