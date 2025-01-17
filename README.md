@@ -1,4 +1,4 @@
-An operating system simulation written in python. tkinter canvas carries it
+An operating system simulation written in python.
 
 # Requirements
 Tkinterweb is required to run this project (its not even used idk why i put in in)
