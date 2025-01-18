@@ -92,6 +92,8 @@ def startMenuClicked(event):
         canvas.create_text(520, 200, text= "Text Editor", fill="white", font=("Arial", 10), anchor="center", tags = "app webbrowser startMenu")
         cliInterfaceAppID = canvas.create_rectangle(600, 150, 640, 190, fill = "grey", tags = "app draggable cliInterface startMenu") #app icon for cli interface
         canvas.create_text(620, 200, text= "CLI Interface", fill="white", font=("Arial", 10), anchor="center", tags = "app cliInterface startMenu")
+        settingsAppID = canvas.create_rectangle(700, 150, 740, 190, fill = "purple", tags = "app draggable settings startMenu") #app icon for settings
+        canvas.create_text(720, 200, text= "Settings", fill="white", font=("Arial", 10), anchor="center", tags = "app settings startMenu")
         canvas.create_text(640, 100, text="Start Menu", fill="white", font=("Arial", 20), anchor="center", tags = "app startMenu")
         powerOffButton = canvas.create_rectangle(620, 600, 660, 640, fill = "red", tags = "app startMenu")
         canvas.create_text(640, 650, text= "Shut Down", fill="white", font=("Arial", 10), anchor="center", tags = "app startMenu")
@@ -101,6 +103,7 @@ def startMenuClicked(event):
         canvas.tag_bind(webBrowserAppID, "<Button-1>", webBrowserApp) 
         canvas.tag_bind(textEditorAppID, "<Button-1>", textEditor)
         canvas.tag_bind(cliInterfaceAppID, "<Button-1>", openCLI)
+        canvas.tag_bind(settingsAppID, "<Button-1>", settingsApp)
 
 
 def closeStartMenu(event):
@@ -135,6 +138,73 @@ def closeApps(appToDelete):
 def closeDesktop(event):
     canvas.delete("startMenu")
 
+def settingsApp(event):
+    global desktopTimeSetting, desktopTimeEnabled, desktopTimeButtonID
+
+    closeStartMenu(1)
+
+    desktopTimeSetting = "red"
+
+    if desktopTimeEnabled is True:
+        desktopTimeSetting = "green"
+    else:
+        desktopTimeSetting = "red"
+
+    canvas.create_rectangle(0, 0, 1280, 670, fill="black", tags="settings")
+    draggable = canvas.create_rectangle(10, 10, 1270, 50, fill="grey", tags="settings")
+    appHeader = canvas.create_text(640, 30, text="Settings", fill="black", font=("Arial", 20), anchor="center", tags = "settings")
+    closeButton = canvas.create_rectangle(1230, 10, 1270, 50, fill="red", tags="settings")
+    canvas.create_text(100, 80, text="Taskbar Time", fill="white", font=("Arial", 20), anchor="center", tags = "settings")
+    desktopTimeButtonID = canvas.create_rectangle(200, 60, 240, 100, fill=desktopTimeSetting, tags="settings")
+    applyChangesButtonID = canvas.create_rectangle(480, 600, 800, 660, fill="green", tags="settings")
+    applyChangesTextID = canvas.create_text(640, 630, text="Apply Changes", fill="white", font=("Arial", 20), anchor="center", tags = "settings")
+
+
+    canvas.tag_bind(closeButton, "<Button-1>", checkChanges)
+    canvas.tag_bind(desktopTimeButtonID, "<Button-1>", configureDesktopTimer)
+    canvas.tag_bind(applyChangesButtonID, "<Button-1>", applySettings)
+    canvas.tag_bind(applyChangesTextID, "<Button-1>", applySettings)
+
+def applySettings(event):
+    canvas.delete("all")
+    init()
+
+class MockEvent:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+def checkChanges(event):
+    global desktopTimeSetting, desktopTimeEnabled
+
+    if desktopTimeSetting == "green":
+        desktopTimeEnabled = True
+    else:
+        desktopTimeEnabled = False
+    
+    pointer_x = app.winfo_pointerx()  # Screen x-coordinate
+    pointer_y = app.winfo_pointery()  # Screen y-coordinate
+
+    # Convert screen coordinates to canvas coordinates
+    canvas_x = canvas.canvasx(pointer_x)
+    canvas_y = canvas.canvasy(pointer_y)
+
+
+    mock_event = MockEvent(canvas_x, canvas_y)
+
+    closeCurrentApp(mock_event)
+
+def configureDesktopTimer(event):
+    global desktopTimeEnabled, desktopTimeButtonID
+
+    if desktopTimeEnabled is True:
+        desktopTimeEnabled = False
+        canvas.itemconfig(desktopTimeButtonID, fill="red")
+    else:
+        desktopTimeEnabled = True
+        canvas.itemconfig(desktopTimeButtonID, fill="green")
+
+
 def clockApp(event):
     
     closeStartMenu(1)
@@ -160,9 +230,13 @@ def clockApp(event):
     update_time()
 
 def desktop(event):
+    global timeID, desktopTimeEnabled
+
     READMEIconID = canvas.create_rectangle(20, 10, 80, 90, fill = "blue", tags = "desktop")
     canvas.create_text(50, 100, text= "README", fill="black", font=("Arial", 10), anchor="center", tags = "desktop")
     canvas.tag_bind(READMEIconID, "<Button-1>", openReadmeDoc)
+    if desktopTimeEnabled:
+        timeID = canvas.create_text(1200,695, text = "00:00:00", fill = "white", font = ("Arial", 20))
 
 def openReadmeDoc(event):
 
@@ -206,10 +280,10 @@ def loadFile(event):
     entry.delete("1.0", tkinter.END)
     entry.insert("1.0", content)
 
-#def updateDesktopTime():
-#   current_time = strftime("%H:%M:%S")
-#   canvas.itemconfig(timeID, text=current_time)
-#   canvas.after(1000, updateDesktopTime)
+def updateDesktopTime():
+   current_time = strftime("%H:%M:%S")
+   canvas.itemconfig(timeID, text=current_time)
+   canvas.after(1000, updateDesktopTime)
 
 def openCLI(event):
     global entryCLI, entry_windowCLI, cliBg
@@ -316,6 +390,15 @@ def repairSystem():
     with open("disk/bsodLog/bsod.txt", "w") as file:
         file.write("0") 
 
+def init():
+    taskbar(True)
+    desktop(1)
+
+    startMenuID = canvas.create_rectangle(10, 675, 50, 715, fill = "black")
+    canvas.tag_bind(startMenuID, "<Button-1>", startMenuClicked)
+
+    updateDesktopTime()
+
 app = tkinter.Tk()
 app.title("PyOS")
 app.geometry("1920x1080") # true dimensions approx.: 1280, 720. Top of screen is 0 for some reason (bottom is 720)
@@ -327,23 +410,16 @@ is_dragging = {"value": False}
 
 startMenuOpen = False
 
-appTags = ["clock", "shutDown", "webbrowser", "readme", "textEditor", "cli"]
+appTags = ["clock", "shutDown", "webbrowser", "readme", "textEditor", "cli", "settings"]
 cliOpen = True
+
+desktopTimeEnabled = True
 
 app.bind("<Escape>", quit)
 
 canvas = tkinter.Canvas(app, width=1000, height=600, bg="grey")
 canvas.pack(fill = "both", expand = True)
 
-taskbar(True)
-
-startMenuID = canvas.create_rectangle(10, 675, 50, 715, fill = "black")
-canvas.tag_bind(startMenuID, "<Button-1>", startMenuClicked)
-
-#timeID = canvas.create_text(1200,695, text = "00:00:00", fill = "white", font = ("Arial", 20))
-#updateDesktopTime()
-#currently broken
-
-openCLI(1)
+init()
 
 app.mainloop()

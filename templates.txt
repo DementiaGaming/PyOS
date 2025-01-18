@@ -1,0 +1,11 @@
+# code templates to copy paste
+
+# blank app template
+    closeStartMenu(1)
+
+    canvas.create_rectangle(0, 0, 1280, 670, fill="black", tags="")
+    draggable = canvas.create_rectangle(10, 10, 1270, 50, fill="grey", tags="")
+    appHeader = canvas.create_text(640, 30, text="App Name", fill="black", font=("Arial", 20), anchor="center", tags = "")
+    closeButton = canvas.create_rectangle(1230, 10, 1270, 50, fill="red", tags="")
+
+    canvas.tag_bind(closeButton, "<Button-1>", closeCurrentApp)
