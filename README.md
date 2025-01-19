@@ -1,12 +1,16 @@
 An operating system simulation written in python.
 
 # Requirements
-Tkinterweb is required to run this project (its not even used idk why i put in in)
+Install required libraries with this command
 ```
-pip install tkinterweb
+pip install -r requirements.txt
 ```
 
 # Features
+Boot Animation
+
+Startup/Shutdown Sounds
+
 Desktop Environment
 
 Start menu
@@ -14,6 +18,8 @@ Start menu
 Clock app
 
 Text Editor (can be saved)
+
+Settings app
 
 Bsod
 

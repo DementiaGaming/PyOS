@@ -3,12 +3,17 @@ import os
 from time import strftime
 import time
 import tkinter.test
-import tkinterweb
+import playsound
 
-PyOSVersion = "1.0.0"
+PyOSVersion = "1.1.0"
 
 def quit(event):
-    app.quit()
+    if not skipShutdownAnim:
+        playsound.playsound("assets\sounds\WindowsXPShutdown.mp3", False)
+        app.after(1000, lambda: canvas.delete("all"))
+        app.after(3500, lambda: app.quit())
+    else:
+        app.quit()
 
 def start_drag(event):
     item = canvas.find_closest(event.x, event.y)[0]
@@ -138,50 +143,12 @@ def closeApps(appToDelete):
 def closeDesktop(event):
     canvas.delete("startMenu")
 
-def settingsApp(event):
-    global desktopTimeSetting, desktopTimeEnabled, desktopTimeButtonID
-
-    closeStartMenu(1)
-
-    desktopTimeSetting = "red"
-
-    if desktopTimeEnabled is True:
-        desktopTimeSetting = "green"
-    else:
-        desktopTimeSetting = "red"
-
-    canvas.create_rectangle(0, 0, 1280, 670, fill="black", tags="settings")
-    draggable = canvas.create_rectangle(10, 10, 1270, 50, fill="grey", tags="settings")
-    appHeader = canvas.create_text(640, 30, text="Settings", fill="black", font=("Arial", 20), anchor="center", tags = "settings")
-    closeButton = canvas.create_rectangle(1230, 10, 1270, 50, fill="red", tags="settings")
-    canvas.create_text(100, 80, text="Taskbar Time", fill="white", font=("Arial", 20), anchor="center", tags = "settings")
-    desktopTimeButtonID = canvas.create_rectangle(200, 60, 240, 100, fill=desktopTimeSetting, tags="settings")
-    applyChangesButtonID = canvas.create_rectangle(480, 600, 800, 660, fill="green", tags="settings")
-    applyChangesTextID = canvas.create_text(640, 630, text="Apply Changes", fill="white", font=("Arial", 20), anchor="center", tags = "settings")
-
-
-    canvas.tag_bind(closeButton, "<Button-1>", checkChanges)
-    canvas.tag_bind(desktopTimeButtonID, "<Button-1>", configureDesktopTimer)
-    canvas.tag_bind(applyChangesButtonID, "<Button-1>", applySettings)
-    canvas.tag_bind(applyChangesTextID, "<Button-1>", applySettings)
-
-def applySettings(event):
-    canvas.delete("all")
-    init()
-
 class MockEvent:
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
-def checkChanges(event):
-    global desktopTimeSetting, desktopTimeEnabled
-
-    if desktopTimeSetting == "green":
-        desktopTimeEnabled = True
-    else:
-        desktopTimeEnabled = False
-    
+def createMockEvent():
     pointer_x = app.winfo_pointerx()  # Screen x-coordinate
     pointer_y = app.winfo_pointery()  # Screen y-coordinate
 
@@ -189,10 +156,122 @@ def checkChanges(event):
     canvas_x = canvas.canvasx(pointer_x)
     canvas_y = canvas.canvasy(pointer_y)
 
-
     mock_event = MockEvent(canvas_x, canvas_y)
 
-    closeCurrentApp(mock_event)
+    return mock_event
+
+def settingsApp(event):
+    global desktopTimeSetting, desktopTimeEnabled, desktopTimeButtonID, skipBootAnimButtonID, skipBootAnimSetting, skipShutdownAnimButtonID
+
+    closeStartMenu(1)
+
+    desktopTimeSetting = "red"
+    skipBootAnimSetting = "red"
+    skipShutdownAnimSetting = "red"
+
+    if desktopTimeEnabled is True:
+        desktopTimeSetting = "green"
+    else:
+        desktopTimeSetting = "red"
+
+    if skipBootAnimInt == "1":
+        skipBootAnimSetting = "green"
+    else:
+        skipBootAnimSetting = "red"
+
+    if skipShutdownAnimInt == "1":
+        skipShutdownAnimSetting = "green"
+    else:
+        skipShutdownAnimSetting = "red"
+
+    canvas.create_rectangle(0, 0, 1280, 670, fill="black", tags="settings")
+    draggable = canvas.create_rectangle(10, 10, 1270, 50, fill="grey", tags="settings")
+    appHeader = canvas.create_text(640, 30, text="Settings", fill="black", font=("Arial", 20), anchor="center", tags = "settings")
+    closeButton = canvas.create_rectangle(1230, 10, 1270, 50, fill="red", tags="settings")
+
+    canvas.create_text(100, 80, text="Taskbar Time", fill="white", font=("Arial", 20), anchor="center", tags = "settings")
+    desktopTimeButtonID = canvas.create_rectangle(200, 60, 240, 100, fill=desktopTimeSetting, tags="settings")
+
+    canvas.create_text(140, 150, text="Skip Boot Animation", fill="white", font=("Arial", 20), anchor="center", tags = "settings")
+    skipBootAnimButtonID = canvas.create_rectangle(280, 130, 320, 170, fill=skipBootAnimSetting, tags="settings")
+
+    canvas.create_text(170, 220, text="Skip Shutdown Animation", fill="white", font=("Arial", 20), anchor="center", tags = "settings")
+    skipShutdownAnimButtonID = canvas.create_rectangle(340, 200, 380, 240, fill=skipShutdownAnimSetting, tags="settings")
+
+    applyChangesButtonID = canvas.create_rectangle(480, 600, 800, 660, fill="green", tags="settings")
+    applyChangesTextID = canvas.create_text(640, 630, text="Apply Changes", fill="white", font=("Arial", 20), anchor="center", tags = "settings")
+
+
+    canvas.tag_bind(closeButton, "<Button-1>", checkChanges)
+    canvas.tag_bind(desktopTimeButtonID, "<Button-1>", configureDesktopTimer)
+    canvas.tag_bind(skipBootAnimButtonID, "<Button-1>", configureSkipBootAnim)
+    canvas.tag_bind(skipShutdownAnimButtonID, "<Button-1>", configureSkipShutdownAnim)
+    canvas.tag_bind(applyChangesButtonID, "<Button-1>", applySettings)
+    canvas.tag_bind(applyChangesTextID, "<Button-1>", applySettings)
+
+def applySettings(event):
+    global skipBootAnimInt, skipShutdownAnimInt
+    
+    canvas.delete("all")
+
+    with open("disk\settings\skipBootAnim.txt", "w") as file:
+        if skipBootAnim == True:
+            file.write("1")
+            skipBootAnimInt = "1"
+        else:
+            file.write("0")
+            skipBootAnimInt = "0"
+    
+    with open("disk\settings\skipShutdownAnim.txt", "w") as file:
+        if skipShutdownAnim == True:
+            file.write("1")
+            skipShutdownAnimInt = "1"
+        else:
+            file.write("0")
+            skipShutdownAnimInt = "0"
+
+    init()
+
+def checkChanges(event):
+    global desktopTimeSetting, desktopTimeEnabled, skipBootAnim, skipShutdownAnim
+
+    if desktopTimeSetting == "green":
+        desktopTimeEnabled = True
+    else:
+        desktopTimeEnabled = False
+    
+    if skipBootAnimInt == "1":
+        skipBootAnim = True
+    else:
+        skipBootAnim = False
+
+    if skipShutdownAnimInt == "1":
+        skipShutdownAnim = True
+    else:
+        skipShutdownAnim = False
+
+    closeCurrentApp(createMockEvent())
+
+def configureSkipShutdownAnim(event):
+    global skipShutdownAnim, skipBootAnimSetting, skipShutdownAnimButtonID
+
+    if skipShutdownAnim is False:
+        skipShutdownAnim = True
+        canvas.itemconfig(skipShutdownAnimButtonID, fill="green")
+    else:
+        skipShutdownAnim = False
+        canvas.itemconfig(skipShutdownAnimButtonID, fill="red")
+
+
+def configureSkipBootAnim(event):
+    global skipBootAnimButtonID, skipBootAnimSetting, skipBootAnim
+
+    if skipBootAnim is False:
+        skipBootAnim = True
+        canvas.itemconfig(skipBootAnimButtonID, fill="green")
+    else:
+        skipBootAnim = False
+        canvas.itemconfig(skipBootAnimButtonID, fill="red")
 
 def configureDesktopTimer(event):
     global desktopTimeEnabled, desktopTimeButtonID
@@ -298,7 +377,7 @@ def openCLI(event):
         entryCLI.insert("1.0", "Entering recovery mode...\nA fatal error occured on last boot. Type 'repair' to attempt system repair.\n<recovery>")
         entryCLI.bind("<Return>", processRecoveryCommand)
     else:
-        entryCLI.insert("1.0", "PyOS Version 1.0.0\nWelcome to PyOS. Type 'help' for a list of commands.\n<root>")
+        entryCLI.insert("1.0", f"PyOS Version {PyOSVersion}\nWelcome to PyOS. Type 'help' for a list of commands.\n<root>")
         entryCLI.bind("<Return>", processCommand)
 
 def processCommand(event):
@@ -399,6 +478,38 @@ def init():
 
     updateDesktopTime()
 
+def bootAnim():
+    image = tkinter.PhotoImage(file="assets/images/python.png")
+    app.after(1000, lambda: canvas.create_image(640, 250, image=image, tags="boot"))
+    app.after(1000, lambda: canvas.create_text(640, 430, text="PyOS", font=("Arial", 40), fill="Black", tags="boot"))
+
+    app.after(2500, lambda: canvas.create_rectangle(340, 500, 940, 580, fill = "black", tags="boot"))
+
+    app.after(3000, lambda: canvas.create_rectangle(345, 505, 375, 575, fill = "grey", tags="boot"))
+    app.after(3500, lambda: canvas.create_rectangle(380, 505, 410, 575, fill = "grey", tags="boot"))
+    app.after(4000, lambda: canvas.create_rectangle(415, 505, 445, 575, fill = "grey", tags="boot"))
+    app.after(4500, lambda: canvas.create_rectangle(450, 505, 480, 575, fill = "grey", tags="boot"))
+    app.after(5000, lambda: canvas.create_rectangle(485, 505, 515, 575, fill = "grey", tags="boot"))
+    app.after(5500, lambda: canvas.create_rectangle(520, 505, 550, 575, fill = "grey", tags="boot"))
+    app.after(5600, lambda: canvas.create_rectangle(555, 505, 585, 575, fill = "grey", tags="boot"))
+    app.after(5700, lambda: canvas.create_rectangle(590, 505, 620, 575, fill = "grey", tags="boot"))
+    app.after(5800, lambda: canvas.create_rectangle(625, 505, 655, 575, fill = "grey", tags="boot"))
+    app.after(5900, lambda: canvas.create_rectangle(660, 505, 690, 575, fill = "grey", tags="boot"))
+    app.after(6000, lambda: canvas.create_rectangle(695, 505, 725, 575, fill = "grey", tags="boot"))
+    app.after(7500, lambda: canvas.create_rectangle(730, 505, 760, 575, fill = "grey", tags="boot"))
+    app.after(8000, lambda: canvas.create_rectangle(765, 505, 795, 575, fill = "grey", tags="boot"))
+    app.after(9000, lambda: canvas.create_rectangle(800, 505, 830, 575, fill = "grey", tags="boot"))
+    app.after(10000, lambda: canvas.create_rectangle(835, 505, 865, 575, fill = "grey", tags="boot"))
+    app.after(11500, lambda: canvas.create_rectangle(870, 505, 900, 575, fill = "grey", tags="boot"))
+    app.after(13500, lambda: canvas.create_rectangle(905, 505, 935, 575, fill = "grey", tags="boot"))
+
+    app.after(13500, lambda: playsound.playsound("assets\sounds\macosStartup.mp3", False))
+    app.after(14500, lambda: canvas.delete("all"))
+    app.after(15000, init)
+
+    app.image = image
+
+
 app = tkinter.Tk()
 app.title("PyOS")
 app.geometry("1920x1080") # true dimensions approx.: 1280, 720. Top of screen is 0 for some reason (bottom is 720)
@@ -420,6 +531,28 @@ app.bind("<Escape>", quit)
 canvas = tkinter.Canvas(app, width=1000, height=600, bg="grey")
 canvas.pack(fill = "both", expand = True)
 
-init()
+skipBootAnim = False
+skipShutdownAnim = False
+
+with open("disk\settings\skipBootAnim.txt", "r") as file:
+    skipBootAnimInt = file.readline().strip()
+
+with open("disk\settings\skipShutdownAnim.txt", "r") as file:
+    skipShutdownAnimInt = file.readline().strip()
+
+if skipBootAnimInt == "1":
+    skipBootAnim = True
+else:
+    skipBootAnim = False
+
+if skipShutdownAnimInt == "1":
+    skipShutdownAnim = True
+else:
+    skipShutdownAnim = False
+
+if not skipBootAnim:
+    bootAnim()
+else:
+    init()
 
 app.mainloop()

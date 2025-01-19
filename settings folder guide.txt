@@ -1,0 +1,4 @@
+guide for settings folder
+
+0 means disabled
+1 means enabled
