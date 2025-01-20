@@ -506,6 +506,7 @@ def bootAnim():
     app.after(13500, lambda: playsound.playsound("assets\sounds\macosStartup.mp3", False))
     app.after(14500, lambda: canvas.delete("all"))
     app.after(15000, init)
+    app.after(15000, lambda: app.bind("<Escape>", quit))
 
     app.image = image
 
@@ -526,7 +527,6 @@ cliOpen = True
 
 desktopTimeEnabled = True
 
-app.bind("<Escape>", quit)
 
 canvas = tkinter.Canvas(app, width=1000, height=600, bg="grey")
 canvas.pack(fill = "both", expand = True)
@@ -553,6 +553,7 @@ else:
 if not skipBootAnim:
     bootAnim()
 else:
+    app.bind("<Escape>", quit)
     init()
 
 app.mainloop()
