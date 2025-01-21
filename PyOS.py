@@ -4,6 +4,7 @@ from time import strftime
 import time
 import tkinter.test
 import playsound
+import random
 
 PyOSVersion = "1.1.0"
 
@@ -431,6 +432,7 @@ rm -rf /    - Delete the all saved files
         entryCLI.insert(tkinter.END, f"\nProccess terminated\n{directory}")
     else:
         entryCLI.insert(tkinter.END, f"\nUnknown Command\n{directory}")
+        playsound.playsound("assets\sounds\error.mp3", False)
 
 def processRecoveryCommand(event):
     current_line = entryCLI.index("insert").split(".")[0]
