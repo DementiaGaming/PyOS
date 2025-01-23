@@ -344,12 +344,20 @@ def textEditor(event):
     draggable = canvas.create_rectangle(10, 10, 1270, 50, fill="grey", tags="textEditor")
     appHeader = canvas.create_text(640, 30, text="Text Editor", fill="black", font=("Arial", 20), anchor="center", tags = "textEditor")
     closeButton = canvas.create_rectangle(1230, 10, 1270, 50, fill="red", tags="textEditor")
-    saveButton = canvas.create_rectangle(10, 10, 50, 50, fill="blue", tags="textEditor")
-    loadButton = canvas.create_rectangle(50, 10, 90, 50, fill="green", tags="textEditor")
+    saveButton = canvas.create_rectangle(70, 675, 400, 715, fill="red", tags="textEditor")
+    loadButton = canvas.create_rectangle(420, 675, 750, 715, fill="red", tags="textEditor")
+    clearButton = canvas.create_rectangle(770, 675, 1100, 715, fill="red", tags="textEditor")
+    saveText = canvas.create_text(235, 695, text="Save", font=("Arial", 20), anchor="center", tags="textEditor")
+    loadText = canvas.create_text(580, 695, text="Load", font=("Arial", 20), anchor="center", tags="textEditor")
+    clearText = canvas.create_text(935, 695, text="Clear", font=("Arial", 20), anchor="center", tags="textEditor")
 
     canvas.tag_bind(closeButton, "<Button-1>", closeCurrentApp)
     canvas.tag_bind(saveButton, "<Button-1>", saveFile)
     canvas.tag_bind(loadButton, "<Button-1>", loadFile)
+    canvas.tag_bind(saveText, "<Button-1>", saveFile)
+    canvas.tag_bind(loadText, "<Button-1>", loadFile)
+    canvas.tag_bind(clearButton, "<Button-1>", lambda event: entry.delete("1.0", tkinter.END))
+    canvas.tag_bind(clearText, "<Button-1>", lambda event: entry.delete("1.0", tkinter.END))
 
 def saveFile(event):
     text = entry.get("1.0", tkinter.END).strip()
