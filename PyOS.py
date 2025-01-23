@@ -100,6 +100,8 @@ def startMenuClicked(event):
         canvas.create_text(620, 200, text= "CLI Interface", fill="white", font=("Arial", 10), anchor="center", tags = "app cliInterface startMenu")
         settingsAppID = canvas.create_rectangle(700, 150, 740, 190, fill = "purple", tags = "app draggable settings startMenu") #app icon for settings
         canvas.create_text(720, 200, text= "Settings", fill="white", font=("Arial", 10), anchor="center", tags = "app settings startMenu")
+        paintAppID = canvas.create_rectangle(800, 150, 840, 190, fill = "pink", tags = "app draggable paint startMenu") #app icon for paint
+        canvas.create_text(820, 200, text= "Paint", fill="white", font=("Arial", 10), anchor="center", tags = "app paint startMenu")  
         canvas.create_text(640, 100, text="Start Menu", fill="white", font=("Arial", 20), anchor="center", tags = "app startMenu")
         powerOffButton = canvas.create_rectangle(620, 600, 660, 640, fill = "red", tags = "app startMenu")
         canvas.create_text(640, 650, text= "Shut Down", fill="white", font=("Arial", 10), anchor="center", tags = "app startMenu")
@@ -110,6 +112,7 @@ def startMenuClicked(event):
         canvas.tag_bind(textEditorAppID, "<Button-1>", textEditor)
         canvas.tag_bind(cliInterfaceAppID, "<Button-1>", openCLI)
         canvas.tag_bind(settingsAppID, "<Button-1>", settingsApp)
+        canvas.tag_bind(paintAppID, "<Button-1>", paintApp)
 
 
 def closeStartMenu(event):
@@ -512,6 +515,51 @@ def bootAnim():
 
     app.image = image
 
+def paintApp(event):
+    closeStartMenu(1)
+
+    canvas.create_rectangle(0, 0, 1280, 670, fill="black", tags="paint")
+    canvas.create_rectangle(30, 80, 170, 640, fill="grey", tags="paint")
+    #colours
+    blackID = canvas.create_rectangle(35, 90, 95, 150, fill="black", tags="paint")
+    whiteID = canvas.create_rectangle(105, 90, 165, 150, fill="white", tags="paint")
+    redID = canvas.create_rectangle(35, 160, 95, 220, fill="red", tags="paint")
+    orangeID = canvas.create_rectangle(105, 160, 165, 220, fill="orange", tags="paint")
+    blueID = canvas.create_rectangle(35, 230, 95, 290, fill="blue", tags="paint")
+    greenID = canvas.create_rectangle(105, 230, 165, 290, fill="green", tags="paint")
+    yellowID = canvas.create_rectangle(35, 300, 95, 360, fill="yellow", tags="paint")
+    pinkID = canvas.create_rectangle(105, 300, 165, 360, fill="pink", tags="paint")
+    purpleID = canvas.create_rectangle(35, 370, 95, 430, fill="purple", tags="paint")
+    brownID = canvas.create_rectangle(105, 370, 165, 430, fill="brown", tags="paint")
+
+    paintArea = canvas.create_rectangle(200, 50, 1080, 670, fill="white", outline="white", tags="paint")
+    draggable = canvas.create_rectangle(10, 10, 1270, 50, fill="grey", tags="paint")
+    appHeader = canvas.create_text(640, 30, text="Paint", fill="black", font=("Arial", 20), anchor="center", tags="paint")
+    closeButton = canvas.create_rectangle(1230, 10, 1270, 50, fill="red", tags="paint")
+
+    canvas.tag_bind(paintArea, "<B1-Motion>", paintSquares)
+    canvas.tag_bind(paintArea, "<Button-1>", paintSquares)
+    canvas.tag_bind(closeButton, "<Button-1>", closeCurrentApp)
+    canvas.tag_bind(blackID, "<Button-1>", lambda event: changeBrushColour(event, "black"))
+    canvas.tag_bind(whiteID, "<Button-1>", lambda event: changeBrushColour(event, "white"))
+    canvas.tag_bind(redID, "<Button-1>", lambda event: changeBrushColour(event, "red"))
+    canvas.tag_bind(orangeID, "<Button-1>", lambda event: changeBrushColour(event, "orange"))
+    canvas.tag_bind(blueID, "<Button-1>", lambda event: changeBrushColour(event, "blue"))
+    canvas.tag_bind(greenID, "<Button-1>", lambda event: changeBrushColour(event, "green"))
+    canvas.tag_bind(yellowID, "<Button-1>", lambda event: changeBrushColour(event, "yellow"))
+    canvas.tag_bind(pinkID, "<Button-1>", lambda event: changeBrushColour(event, "pink"))
+    canvas.tag_bind(purpleID, "<Button-1>", lambda event: changeBrushColour(event, "purple"))
+    canvas.tag_bind(brownID, "<Button-1>", lambda event: changeBrushColour(event, "brown"))
+
+def changeBrushColour(event, colour):
+    global paintBrushColour
+    paintBrushColour = colour
+
+def paintSquares(event):
+    if event.x >= 200 and event.x <= 1070:
+        if event.y >= 50 and event.y <= 660:
+            canvas.create_rectangle(event.x, event.y, event.x + 10, event.y + 10, fill=paintBrushColour, outline=paintBrushColour, tags="paint")
+
 
 app = tkinter.Tk()
 app.title("PyOS")
@@ -524,7 +572,7 @@ is_dragging = {"value": False}
 
 startMenuOpen = False
 
-appTags = ["clock", "shutDown", "webbrowser", "readme", "textEditor", "cli", "settings"]
+appTags = ["clock", "shutDown", "webbrowser", "readme", "textEditor", "cli", "settings", "paint"]
 cliOpen = True
 
 desktopTimeEnabled = True
@@ -532,6 +580,8 @@ desktopTimeEnabled = True
 
 canvas = tkinter.Canvas(app, width=1000, height=600, bg="grey")
 canvas.pack(fill = "both", expand = True)
+
+paintBrushColour = "black"
 
 skipBootAnim = False
 skipShutdownAnim = False
