@@ -474,7 +474,7 @@ def bsod():
     canvas.create_rectangle(0, 0, 1280, 720, fill = "white", tags="cli")
     app.after(1000, lambda: canvas.create_rectangle(0, 0, 1280, 720, fill = "blue", tags="cli"))
     app.after(1000, lambda: canvas.create_text(640, 360, text="Fatal Error", font=("Courier", 40), fill="white"))
-    app.after(6000, quit, "event")
+    app.after(6000, lambda: app.quit())
     with open("disk/bsodLog/bsod.txt", "w") as file: # 1 means bsod happend and 0 means it didnt
         file.write("1")
     
@@ -600,6 +600,9 @@ with open("disk\settings\skipBootAnim.txt", "r") as file:
 with open("disk\settings\skipShutdownAnim.txt", "r") as file:
     skipShutdownAnimInt = file.readline().strip()
 
+with open("disk/bsodLog/bsod.txt", "r") as file:
+    didBsodHappenLastTime = file.read()
+
 if skipBootAnimInt == "1":
     skipBootAnim = True
 else:
@@ -610,8 +613,10 @@ if skipShutdownAnimInt == "1":
 else:
     skipShutdownAnim = False
 
-if not skipBootAnim:
+if not skipBootAnim and didBsodHappenLastTime != "1":
     bootAnim()
+elif didBsodHappenLastTime == "1":
+    openCLI(1)
 else:
     app.bind("<Escape>", quit)
     init()
