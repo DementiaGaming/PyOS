@@ -27,4 +27,4 @@ Bsod
 
 Command Line
 
-(probably more but im too lazy to keep updating this
+(probably more but im too lazy to keep updating this)
