@@ -9,3 +9,21 @@
     closeButton = canvas.create_rectangle(1230, 10, 1270, 50, fill="red", tags="")
 
     canvas.tag_bind(closeButton, "<Button-1>", closeCurrentApp)
+
+# save load and clear buttons
+    saveButton = canvas.create_rectangle(70, 675, 400, 715, fill="red", tags="")
+    loadButton = canvas.create_rectangle(420, 675, 750, 715, fill="red", tags="")
+    clearButton = canvas.create_rectangle(770, 675, 1100, 715, fill="red", tags="")
+
+    saveText = canvas.create_text(235, 695, text="Save", font=("Arial", 20), anchor="center", tags="")
+    loadText = canvas.create_text(580, 695, text="Load", font=("Arial", 20), anchor="center", tags="")
+    clearText = canvas.create_text(935, 695, text="Clear", font=("Arial", 20), anchor="center", tags="")
+
+    canvas.tag_bind(saveButton, "<Button-1>", )
+    canvas.tag_bind(saveText, "<Button-1>", )
+
+    canvas.tag_bind(loadButton, "<Button-1>", )
+    canvas.tag_bind(loadText, "<Button-1>", )
+
+    canvas.tag_bind(clearButton, "<Button-1>", )
+    canvas.tag_bind(clearText, "<Button-1>", )
