@@ -4,6 +4,7 @@ from time import strftime
 import time
 import playsound
 import random
+import datetime
 
 PyOSVersion = "1.1.0"
 
@@ -89,18 +90,25 @@ def startMenuClicked(event):
     else:
         startMenuOpen = True
         canvas.create_rectangle(0, 0, 1280, 670, fill = "black", tags = "app startMenu")
-        clockAppButtonID = canvas.create_rectangle(300, 150, 340, 190, fill = "blue", tags = "app draggable clock startMenu") #app icon for clock
-        canvas.create_text(320, 200, text= "Clock", fill="white", font=("Arial", 10), anchor="center", tags = "app clock startMenu")
-        webBrowserAppID = canvas.create_rectangle(400, 150, 440, 190, fill = "green", tags = "app draggable webbrowser startMenu") #app icon for webbrowser
-        canvas.create_text(420, 200, text= "Web Browser", fill="white", font=("Arial", 10), anchor="center", tags = "app webbrowser startMenu")
-        textEditorAppID = canvas.create_rectangle(500, 150, 540, 190, fill = "yellow", tags = "app draggable textEditor startMenu") #app icon for text editor
-        canvas.create_text(520, 200, text= "Text Editor", fill="white", font=("Arial", 10), anchor="center", tags = "app webbrowser startMenu")
-        cliInterfaceAppID = canvas.create_rectangle(600, 150, 640, 190, fill = "grey", tags = "app draggable cliInterface startMenu") #app icon for cli interface
-        canvas.create_text(620, 200, text= "CLI Interface", fill="white", font=("Arial", 10), anchor="center", tags = "app cliInterface startMenu")
-        settingsAppID = canvas.create_rectangle(700, 150, 740, 190, fill = "purple", tags = "app draggable settings startMenu") #app icon for settings
-        canvas.create_text(720, 200, text= "Settings", fill="white", font=("Arial", 10), anchor="center", tags = "app settings startMenu")
-        paintAppID = canvas.create_rectangle(800, 150, 840, 190, fill = "pink", tags = "app draggable paint startMenu") #app icon for paint
-        canvas.create_text(820, 200, text= "Paint", fill="white", font=("Arial", 10), anchor="center", tags = "app paint startMenu")  
+
+        clockAppButtonID = canvas.create_rectangle(320, 150, 360, 190, fill = "blue", tags = "app draggable clock startMenu") #app icon for clock
+        canvas.create_text(340, 200, text= "Clock", fill="white", font=("Arial", 10), anchor="center", tags = "app clock startMenu")
+
+        webBrowserAppID = canvas.create_rectangle(420, 150, 460, 190, fill = "green", tags = "app draggable webbrowser startMenu") #app icon for webbrowser
+        canvas.create_text(440, 200, text= "Web Browser", fill="white", font=("Arial", 10), anchor="center", tags = "app webbrowser startMenu")
+        
+        textEditorAppID = canvas.create_rectangle(520, 150, 560, 190, fill = "yellow", tags = "app draggable textEditor startMenu") #app icon for text editor
+        canvas.create_text(540, 200, text= "Text Editor", fill="white", font=("Arial", 10), anchor="center", tags = "app webbrowser startMenu")
+        
+        cliInterfaceAppID = canvas.create_rectangle(620, 150, 660, 190, fill = "grey", tags = "app draggable cliInterface startMenu") #app icon for cli interface
+        canvas.create_text(640, 200, text= "CLI Interface", fill="white", font=("Arial", 10), anchor="center", tags = "app cliInterface startMenu")
+        
+        settingsAppID = canvas.create_rectangle(720, 150, 760, 190, fill = "purple", tags = "app draggable settings startMenu") #app icon for settings
+        canvas.create_text(740, 200, text= "Settings", fill="white", font=("Arial", 10), anchor="center", tags = "app settings startMenu")
+        
+        paintAppID = canvas.create_rectangle(820, 150, 860, 190, fill = "pink", tags = "app draggable paint startMenu") #app icon for paint
+        canvas.create_text(840, 200, text= "Paint", fill="white", font=("Arial", 10), anchor="center", tags = "app paint startMenu")  
+        
         canvas.create_text(640, 100, text="Start Menu", fill="white", font=("Arial", 20), anchor="center", tags = "app startMenu")
         powerOffButton = canvas.create_rectangle(620, 600, 660, 640, fill = "red", tags = "app startMenu")
         canvas.create_text(640, 650, text= "Shut Down", fill="white", font=("Arial", 10), anchor="center", tags = "app startMenu")
@@ -397,6 +405,7 @@ def openCLI(event):
 
 def processCommand(event):
     import time
+
     current_line = entryCLI.index("insert").split(".")[0]
     line_text = entryCLI.get(f"{current_line}.0", f"{current_line}.end")
 
@@ -410,6 +419,7 @@ exit        - Exit PyOS
 desktop     - Open PyOS desktop
 clear       - Clear the command line
 time        - Get the current time
+date        - Get the current date (YYYY-MM-DD)
 ver         - Get current PyOS version
 status      - Display the system status
 sudo        - Run with admin permisions
@@ -425,6 +435,9 @@ rm -rf /    - Delete the all saved files
     elif line_text == directory + "time":
         time = strftime("%H:%M:%S")
         entryCLI.insert(tkinter.END, f"\n{time}\n{directory}")
+    elif line_text == directory + "date":
+        date = str(datetime.datetime.today()).split()[0]
+        entryCLI.insert(tkinter.END, f"\n{date}\n{directory}")
     elif line_text == directory + "ver":
         entryCLI.insert(tkinter.END, f"\n{PyOSVersion}\n{directory}")
     elif line_text == directory + "status":
@@ -447,6 +460,8 @@ rm -rf /    - Delete the all saved files
     else:
         entryCLI.insert(tkinter.END, f"\nUnknown Command\n{directory}")
         playsound.playsound("assets/sounds/error.mp3", False)
+    
+    return "break"
 
 def processRecoveryCommand(event):
     current_line = entryCLI.index("insert").split(".")[0]
@@ -455,6 +470,7 @@ def processRecoveryCommand(event):
     directory = "<recovery>"
 
     if line_text == directory + "repair":
+        proccessing = True
         entryCLI.insert(tkinter.END, f"\nAttempting system repair...")
         app.after(5000, repairSystem)
         app.after(5000, lambda: entryCLI.insert(tkinter.END, f"\nSuccess! Restart system to finish repair\n{directory}"))
@@ -464,6 +480,8 @@ def processRecoveryCommand(event):
         entryCLI.insert(tkinter.END, f"\nSystem status: Critical\n{directory}") 
     else:
         entryCLI.insert(tkinter.END, f"\nUnknown command\n{directory}")
+
+    return "break"
 
 def closeCLI():
     entryCLI.destroy()
