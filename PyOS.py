@@ -2,7 +2,6 @@ import tkinter
 import os
 from time import strftime
 import time
-import tkinter.test
 import playsound
 import random
 
@@ -10,7 +9,7 @@ PyOSVersion = "1.1.0"
 
 def quit(event):
     if not skipShutdownAnim:
-        playsound.playsound("assets\sounds\WindowsXPShutdown.mp3", False)
+        playsound.playsound("assets/sounds/WindowsXPShutdown.mp3", False)
         app.after(1000, lambda: canvas.delete("all"))
         app.after(3500, lambda: app.quit())
     else:
@@ -140,6 +139,10 @@ def closeCurrentApp(event):
     if appToDelete == "textEditor":
         entry.destroy()
 
+    if appToDelete == "paint":
+        with open("disk/paintFiles/paintTemp.txt", "w") as file:
+            file.write("")
+
 def closeApps(appToDelete):
     print("close apps")
     canvas.delete(f"{appToDelete}")
@@ -218,7 +221,7 @@ def applySettings(event):
     
     canvas.delete("all")
 
-    with open("disk\settings\skipBootAnim.txt", "w") as file:
+    with open("disk/settings/skipBootAnim.txt", "w") as file:
         if skipBootAnim == True:
             file.write("1")
             skipBootAnimInt = "1"
@@ -226,7 +229,7 @@ def applySettings(event):
             file.write("0")
             skipBootAnimInt = "0"
     
-    with open("disk\settings\skipShutdownAnim.txt", "w") as file:
+    with open("disk/settings/skipShutdownAnim.txt", "w") as file:
         if skipShutdownAnim == True:
             file.write("1")
             skipShutdownAnimInt = "1"
@@ -443,7 +446,7 @@ rm -rf /    - Delete the all saved files
         entryCLI.insert(tkinter.END, f"\nProccess terminated\n{directory}")
     else:
         entryCLI.insert(tkinter.END, f"\nUnknown Command\n{directory}")
-        playsound.playsound("assets\sounds\error.mp3", False)
+        playsound.playsound("assets/sounds/error.mp3", False)
 
 def processRecoveryCommand(event):
     current_line = entryCLI.index("insert").split(".")[0]
@@ -516,7 +519,7 @@ def bootAnim():
     app.after(11500, lambda: canvas.create_rectangle(870, 505, 900, 575, fill = "grey", tags="boot"))
     app.after(13500, lambda: canvas.create_rectangle(905, 505, 935, 575, fill = "grey", tags="boot"))
 
-    app.after(13500, lambda: playsound.playsound("assets\sounds\macosStartup.mp3", False))
+    app.after(13500, lambda: playsound.playsound("assets/sounds/macosStartup.mp3", False))
     app.after(14500, lambda: canvas.delete("all"))
     app.after(15000, init)
     app.after(15000, lambda: app.bind("<Escape>", quit))
@@ -545,6 +548,13 @@ def paintApp(event):
     appHeader = canvas.create_text(640, 30, text="Paint", fill="black", font=("Arial", 20), anchor="center", tags="paint")
     closeButton = canvas.create_rectangle(1230, 10, 1270, 50, fill="red", tags="paint")
 
+    saveButton = canvas.create_rectangle(70, 675, 400, 715, fill="red", tags="paint")
+    loadButton = canvas.create_rectangle(420, 675, 750, 715, fill="red", tags="paint")
+    clearButton = canvas.create_rectangle(770, 675, 1100, 715, fill="red", tags="paint")
+    saveText = canvas.create_text(235, 695, text="Save", font=("Arial", 20), anchor="center", tags="paint")
+    loadText = canvas.create_text(580, 695, text="Load", font=("Arial", 20), anchor="center", tags="paint")
+    clearText = canvas.create_text(935, 695, text="Clear", font=("Arial", 20), anchor="center", tags="paint")
+
     canvas.tag_bind(paintArea, "<B1-Motion>", paintSquares)
     canvas.tag_bind(paintArea, "<Button-1>", paintSquares)
     canvas.tag_bind(closeButton, "<Button-1>", closeCurrentApp)
@@ -559,6 +569,13 @@ def paintApp(event):
     canvas.tag_bind(purpleID, "<Button-1>", lambda event: changeBrushColour(event, "purple"))
     canvas.tag_bind(brownID, "<Button-1>", lambda event: changeBrushColour(event, "brown"))
 
+    canvas.tag_bind(saveButton, "<Button-1>", savePaintFile)
+    canvas.tag_bind(loadButton, "<Button-1>", loadPaintFile)
+    canvas.tag_bind(saveText, "<Button-1>", savePaintFile)
+    canvas.tag_bind(loadText, "<Button-1>", loadPaintFile)
+    canvas.tag_bind(clearButton, "<Button-1>", clearPaintFile)
+    canvas.tag_bind(clearText, "<Button-1>", clearPaintFile)
+
 def changeBrushColour(event, colour):
     global paintBrushColour
     paintBrushColour = colour
@@ -566,8 +583,39 @@ def changeBrushColour(event, colour):
 def paintSquares(event):
     if event.x >= 200 and event.x <= 1070:
         if event.y >= 50 and event.y <= 660:
-            canvas.create_rectangle(event.x, event.y, event.x + 10, event.y + 10, fill=paintBrushColour, outline=paintBrushColour, tags="paint")
+            canvas.create_rectangle(event.x, event.y, event.x + 10, event.y + 10, fill=paintBrushColour, outline=paintBrushColour, tags="paint drawn")
+            with open("disk/paintFiles/paintTemp.txt", "a") as file:
+                file.write(f"{event.x} {event.y} {paintBrushColour}\n")
 
+def loadPaintFile(event):
+    canvas.delete("drawn")
+    contents = ""
+
+    with open("disk/paintFiles/paint.txt", "r") as file:
+        for line in file:
+            values = line.split()
+            x = int(values[0])
+            y = int(values[1])
+            colour = values[2]
+            canvas.create_rectangle(x, y, x + 10, y + 10, fill=colour, outline=colour, tags="paint drawn")
+
+    with open("disk/paintFiles/paint.txt", "r") as file:
+        contents = file.read()
+        print(contents)
+
+    with open("disk/paintFiles/paintTemp.txt", "w") as file:
+        file.write(contents)
+
+def savePaintFile(event):
+    with open("disk/paintFiles/paintTemp.txt", "r") as file:
+        contents = file.read()
+        with open("disk/paintFiles/paint.txt", "w") as file:
+            file.write(contents)
+
+def clearPaintFile(event):
+    canvas.delete("drawn")
+    with open("disk/paintFiles/paintTemp.txt", "w") as file:
+        file.write("")
 
 app = tkinter.Tk()
 app.title("PyOS")
@@ -594,10 +642,10 @@ paintBrushColour = "black"
 skipBootAnim = False
 skipShutdownAnim = False
 
-with open("disk\settings\skipBootAnim.txt", "r") as file:
+with open("disk/settings/skipBootAnim.txt", "r") as file:
     skipBootAnimInt = file.readline().strip()
 
-with open("disk\settings\skipShutdownAnim.txt", "r") as file:
+with open("disk/settings/skipShutdownAnim.txt", "r") as file:
     skipShutdownAnimInt = file.readline().strip()
 
 with open("disk/bsodLog/bsod.txt", "r") as file:
