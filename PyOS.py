@@ -485,12 +485,12 @@ def processRecoveryCommand(event):
 
 def closeCLI():
     entryCLI.destroy()
-    canvas.delete(cliBg)   
+    canvas.delete(cliBg)
     taskbar(True)
     desktop(1)
     startMenuID = canvas.create_rectangle(10, 675, 50, 715, fill = "black")
     canvas.tag_bind(startMenuID, "<Button-1>", startMenuClicked)
-    
+
 def bsod():
     canvas.create_rectangle(0, 0, 1280, 720, fill = "white", tags="cli")
     app.after(1000, lambda: canvas.create_rectangle(0, 0, 1280, 720, fill = "blue", tags="cli"))
