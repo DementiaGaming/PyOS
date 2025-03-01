@@ -109,6 +109,9 @@ def startMenuClicked(event):
         paintAppID = canvas.create_rectangle(820, 150, 860, 190, fill = "pink", tags = "app draggable paint startMenu") #app icon for paint
         canvas.create_text(840, 200, text= "Paint", fill="white", font=("Arial", 10), anchor="center", tags = "app paint startMenu")  
         
+        calculatorAppID = canvas.create_rectangle(920, 150, 960, 190, fill = "orange", tags = "app draggable calculator startMenu") #app icon for calculator
+        canvas.create_text(940, 200, text= "Calculator", fill="white", font=("Arial", 10), anchor="center", tags = "app calculator startMenu")  
+
         canvas.create_text(640, 100, text="Start Menu", fill="white", font=("Arial", 20), anchor="center", tags = "app startMenu")
         powerOffButton = canvas.create_rectangle(620, 600, 660, 640, fill = "red", tags = "app startMenu")
         canvas.create_text(640, 650, text= "Shut Down", fill="white", font=("Arial", 10), anchor="center", tags = "app startMenu")
@@ -120,6 +123,7 @@ def startMenuClicked(event):
         canvas.tag_bind(cliInterfaceAppID, "<Button-1>", openCLI)
         canvas.tag_bind(settingsAppID, "<Button-1>", settingsApp)
         canvas.tag_bind(paintAppID, "<Button-1>", paintApp)
+        canvas.tag_bind(calculatorAppID, "<Button-1>", calculatorApp)
 
 
 def closeStartMenu(event):
@@ -683,6 +687,54 @@ def clearPaintFile(event):
     with open("disk/paintFiles/paintTemp.txt", "w") as file:
         file.write("")
 
+def calculatorApp(event):
+    global equationDisplay, equationText
+
+    closeStartMenu(1)
+
+    equationText = ""
+
+    canvas.create_rectangle(0, 0, 1280, 670, fill="black", tags="calculator")
+    draggable = canvas.create_rectangle(10, 10, 1270, 50, fill="grey", tags="calculator")
+    appHeader = canvas.create_text(640, 30, text="Calculator", fill="black", font=("Arial", 20), anchor="center", tags="calculator")
+    closeButton = canvas.create_rectangle(1230, 10, 1270, 50, fill="red", tags="calculator")
+    display = canvas.create_rectangle(10, 60, 1270, 170, fill="grey", tags="calculator")
+    equationDisplay = canvas.create_text(1250, 115, text="", fill="black", font=("Arial", 40), anchor="e", tags="calculator")
+    
+    # Buttons
+    buttons = [
+        ('7', 10, 180), ('8', 330, 180), ('9', 650, 180), ('/', 970, 180),
+        ('4', 10, 300), ('5', 330, 300), ('6', 650, 300), ('*', 970, 300),
+        ('1', 10, 420), ('2', 330, 420), ('3', 650, 420), ('-', 970, 420),
+        ('0', 10, 540), ('+', 330, 540), ('=', 650, 540), ('AC', 970, 540)
+    ]
+
+    for (text, x, y) in buttons:
+        button = canvas.create_rectangle(x, y, x + 300, y + 100, fill="grey", tags="calculator")
+        button_text = canvas.create_text(x + 150, y + 50, text=text, fill="black", font=("Arial", 40), tags="calculator")
+        canvas.tag_bind(button, "<Button-1>", lambda event, t=text: addToCalcDisplay(t))
+        canvas.tag_bind(button_text, "<Button-1>", lambda event, t=text: addToCalcDisplay(t))
+
+    canvas.tag_bind(closeButton, "<Button-1>", closeCurrentApp)
+
+def addToCalcDisplay(text):
+    global equationText, equationDisplay
+
+    if text == "=":
+        try:
+            canvas.itemconfig(equationDisplay, text=str(eval(equationText)))
+            equationText = ""
+        except Exception as e:
+            canvas.itemconfig(equationDisplay, text="Error")
+            equationText = ""
+            print(f"Error: {e}")
+    elif text == "AC":
+        equationText = ""
+        canvas.itemconfig(equationDisplay, text="")
+    else:
+        equationText = f"{equationText}{text}"
+        canvas.itemconfig(equationDisplay, text=equationText)
+
 app = tkinter.Tk()
 app.title("PyOS")
 app.geometry("1920x1080") # true dimensions approx.: 1280, 720. Top of screen is 0 for some reason (bottom is 720)
@@ -694,7 +746,7 @@ is_dragging = {"value": False}
 
 startMenuOpen = False
 
-appTags = ["clock", "shutDown", "webbrowser", "readme", "textEditor", "cli", "settings", "paint"]
+appTags = ["clock", "shutDown", "webbrowser", "readme", "textEditor", "cli", "settings", "paint", "calculator"]
 cliOpen = True
 
 desktopTimeEnabled = True
