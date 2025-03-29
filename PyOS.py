@@ -735,6 +735,7 @@ def addToCalcDisplay(text):
 
 app = tkinter.Tk()
 app.title("PyOS")
+app.iconbitmap("assets/images/python.ico")
 app.geometry("1280x720") # true dimensions approx.: 1280, 720. Top of screen is 0 for some reason (bottom is 720)
 app.resizable(False, False)
 
