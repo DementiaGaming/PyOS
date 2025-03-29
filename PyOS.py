@@ -427,8 +427,6 @@ date        - Get the current date (YYYY-MM-DD)
 ver         - Get current PyOS version
 status      - Displays the system status
 help fun    - Displays a list of fun commands
-sudo        - Run with admin permisions
-rm -rf /    - Delete the all saved files
 {directory}""")
     elif line_text == directory + "help fun":
         entryCLI.insert(tkinter.END, f"""
@@ -737,8 +735,8 @@ def addToCalcDisplay(text):
 
 app = tkinter.Tk()
 app.title("PyOS")
-app.geometry("1920x1080") # true dimensions approx.: 1280, 720. Top of screen is 0 for some reason (bottom is 720)
-app.attributes("-fullscreen", True)
+app.geometry("1280x720") # true dimensions approx.: 1280, 720. Top of screen is 0 for some reason (bottom is 720)
+app.resizable(False, False)
 
 last_mouse_position = {"x": 0, "y": 0}
 current_group = {"tag": None}
