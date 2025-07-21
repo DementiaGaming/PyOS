@@ -6,7 +6,7 @@ import playsound
 import random
 import datetime
 
-PyOSVersion = "1.1.0"
+PyOSVersion = "1.1.0" # definately wrong (i forgor to update)
 
 def quit(event):
     if not skipShutdownAnim:
